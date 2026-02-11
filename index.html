@@ -311,6 +311,57 @@ body{font-family:'DM Sans',sans-serif;background:var(--gray-50);min-height:100vh
 .add-action-btn:hover{border-color:var(--navy);color:var(--navy);background:var(--gray-50)}
 .action-filters{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
 
+
+/* Event Badges */
+.event-badges {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.event-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.7em;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.event-badge.csa {
+  background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+  color: white;
+  border: 1px solid #1e40af;
+}
+
+.event-badge.ga-talent {
+  background: linear-gradient(135deg, #059669, #10b981);
+  color: white;
+  border: 1px solid #047857;
+}
+
+
+.event-badge.ga-greensboro-apr {
+  background: linear-gradient(135deg, #7c3aed, #a78bfa);
+  color: white;
+  border: 1px solid #6d28d9;
+}
+
+.event-badge.ga-california-jun {
+  background: linear-gradient(135deg, #ea580c, #fb923c);
+  color: white;
+  border: 1px solid #c2410c;
+}
+
+.event-badge.winthrop {
+  background: linear-gradient(135deg, #dc2626, #ef4444);
+  color: white;
+  border: 1px solid #b91c1c;
+}
+
 </style>
 </head>
 <body>
@@ -1319,7 +1370,7 @@ const DEFAULT_COLLEGES = [
     ]
   },
   {
-    id:2, name:"Duke University", location:"Durham, NC", conference:"ACC", drive:"~2.5 hrs",
+    id:2, name:"Duke University", events:["csa-feb21"], location:"Durham, NC", conference:"ACC", drive:"~2.5 hrs",
     campRegLink:"https://www.dukesocceracademy.com/id-camps",
     notes:"", favorite:false, contactStatus:"not-contacted",
     camps:[
@@ -1369,7 +1420,7 @@ const DEFAULT_COLLEGES = [
     ]
   },
   {
-    id:6, name:"University of Virginia", location:"Charlottesville, VA", conference:"ACC", drive:"~3.5 hrs",
+    id:6, name:"University of Virginia", events:["csa-feb21"], location:"Charlottesville, VA", conference:"ACC", drive:"~3.5 hrs",
     campRegLink:"https://www.virginiawomenssoccer.com/",
     notes:"", favorite:false, contactStatus:"not-contacted",
     camps:[
@@ -1420,7 +1471,7 @@ const DEFAULT_COLLEGES = [
     ]
   },
   {
-    id:10, name:"Clemson University", location:"Clemson, SC", conference:"ACC", drive:"~1.5 hrs",
+    id:10, name:"Clemson University", events:["csa-feb21"], location:"Clemson, SC", conference:"ACC", drive:"~1.5 hrs",
     campRegLink:"https://www.clemsontigers.com/camps/clemson-soccer-camps/",
     notes:"", favorite:false, contactStatus:"not-contacted",
     camps:[
@@ -1437,7 +1488,7 @@ const DEFAULT_COLLEGES = [
     ]
   },
   {
-    id:11, name:"University of Tennessee", location:"Knoxville, TN", conference:"SEC", drive:"~4.5 hrs",
+    id:11, name:"University of Tennessee", events:["csa-feb21"], location:"Knoxville, TN", conference:"SEC", drive:"~4.5 hrs",
     campRegLink:"https://www.tennesseesoccercamp.com/camps-clinics.cfm",
     notes:"", favorite:false, contactStatus:"not-contacted",
     camps:[
@@ -1548,7 +1599,7 @@ const DEFAULT_COLLEGES = [
   },
   // ── American Athletic / AAC ───────────────────────────────────────────
   {
-    id:21, name:"East Carolina University", location:"Greenville, NC", conference:"American", drive:"~2.5 hrs",
+    id:21, name:"East Carolina University", events:["csa-feb21"], location:"Greenville, NC", conference:"American", drive:"~2.5 hrs",
     campRegLink:"https://www.piratesoccercamps.com/shop",
     notes:"", favorite:false, contactStatus:"not-contacted",
     camps:[
@@ -1570,7 +1621,7 @@ const DEFAULT_COLLEGES = [
   },
   // ── Other D1 within range ─────────────────────────────────────────────
   {
-    id:23, name:"Davidson College", location:"Davidson, NC", conference:"A-10", drive:"~30 min",
+    id:23, name:"Davidson College", events:["csa-feb21"], location:"Davidson, NC", conference:"A-10", drive:"~30 min",
     campRegLink:"https://register.ryzer.com/camp.cfm?id=316265&sport=7",
     notes:"Local! Just north of Charlotte", favorite:false, contactStatus:"not-contacted",
     camps:[
@@ -1581,7 +1632,7 @@ const DEFAULT_COLLEGES = [
     ]
   },
   {
-    id:24, name:"UNC Charlotte", location:"Charlotte, NC", conference:"American", drive:"Local",
+    id:24, name:"UNC Charlotte", events:["csa-feb21"], location:"Charlotte, NC", conference:"American", drive:"Local",
     campRegLink:"https://charlottewomenssoccercamps.totalcamps.com/",
     notes:"Home school — local option", favorite:false, contactStatus:"not-contacted",
     camps:[
@@ -1592,7 +1643,7 @@ const DEFAULT_COLLEGES = [
     ]
   },
   {
-    id:25, name:"Elon University", location:"Elon, NC", conference:"CAA", drive:"~1.5 hrs",
+    id:25, name:"Elon University", events:["csa-feb21"], location:"Elon, NC", conference:"CAA", drive:"~1.5 hrs",
     campRegLink:"https://www.totalcamps.com/ELONWOMENSSOCCERCAMPS",
     notes:"", favorite:false, contactStatus:"not-contacted",
     camps:[
@@ -1603,7 +1654,7 @@ const DEFAULT_COLLEGES = [
     ]
   },
   {
-    id:26, name:"Campbell University", location:"Buies Creek, NC", conference:"Big South", drive:"~2 hrs",
+    id:26, name:"Campbell University", events:["csa-feb21"], location:"Buies Creek, NC", conference:"Big South", drive:"~2 hrs",
     campRegLink:"https://www.camelwomenssoccercamps.com/shop",
     notes:"", favorite:false, contactStatus:"not-contacted",
     camps:[
@@ -1614,7 +1665,7 @@ const DEFAULT_COLLEGES = [
     ]
   },
   {
-    id:27, name:"High Point University", location:"High Point, NC", conference:"Big South", drive:"~1.5 hrs",
+    id:27, name:"High Point University", events:["csa-feb21"], location:"High Point, NC", conference:"Big South", drive:"~1.5 hrs",
     campRegLink:"https://highpointsoccercamps.com/camps/january-id-camp-sunday-1-18-2026",
     notes:"", favorite:false, contactStatus:"not-contacted",
     camps:[
@@ -1627,7 +1678,7 @@ const DEFAULT_COLLEGES = [
     ]
   },
   {
-    id:28, name:"UNC Greensboro", location:"Greensboro, NC", conference:"SoCon", drive:"~1.5 hrs",
+    id:28, name:"UNC Greensboro", events:["csa-feb21"], location:"Greensboro, NC", conference:"SoCon", drive:"~1.5 hrs",
     campRegLink:"https://workmansoccercamps.totalcamps.com/",
     notes:"", favorite:false, contactStatus:"not-contacted",
     camps:[
@@ -1638,7 +1689,7 @@ const DEFAULT_COLLEGES = [
     ]
   },
   {
-    id:29, name:"Western Carolina University", location:"Cullowhee, NC", conference:"SoCon", drive:"~2.5 hrs",
+    id:29, name:"Western Carolina University", events:["csa-feb21"], location:"Cullowhee, NC", conference:"SoCon", drive:"~2.5 hrs",
     campRegLink:"https://www.westerncarolinasoccercamp.com/shop",
     notes:"", favorite:false, contactStatus:"not-contacted",
     camps:[
@@ -1699,7 +1750,7 @@ const DEFAULT_COLLEGES = [
     ]
   },
   {
-    id:34, name:"Winthrop", location:"Rock Hill, SC", conference:"Big South", drive:"~0.5 hrs",
+    id:34, name:"Winthrop", events:["csa-feb21"], location:"Rock Hill, SC", conference:"Big South", drive:"~0.5 hrs",
     campRegLink:"https://www.winthropathletics.com/sports/womens-soccer/camps",
     notes:"", favorite:false, contactStatus:"not-contacted",
     camps:[
@@ -1708,7 +1759,7 @@ const DEFAULT_COLLEGES = [
     staff:[]
   },
   {
-    id:35, name:"Gardner-Webb", location:"Boiling Springs, NC", conference:"Big South", drive:"~1 hrs",
+    id:35, name:"Gardner-Webb", events:["csa-feb21"], location:"Boiling Springs, NC", conference:"Big South", drive:"~1 hrs",
     campRegLink:"https://www.coacheriksoccercamps.com/",
     notes:"", favorite:false, contactStatus:"not-contacted",
     camps:[
@@ -1727,7 +1778,7 @@ const DEFAULT_COLLEGES = [
     staff:[]
   },
   {
-    id:37, name:"Presbyterian", location:"Clinton, SC", conference:"Big South", drive:"~2 hrs",
+    id:37, name:"Presbyterian", events:["csa-feb21"], location:"Clinton, SC", conference:"Big South", drive:"~2 hrs",
     campRegLink:"https://gopchoya.com/sports/womens-soccer",
     notes:"", favorite:false, contactStatus:"not-contacted",
     camps:[
@@ -1839,7 +1890,50 @@ const DEFAULT_COLLEGES = [
 // ══════════════════════════════════════════════
 // STATE
 // ══════════════════════════════════════════════
-let data = { colleges: [], emails: [], nextCollegeId: 100, nextEmailId: 1 };
+let data = { colleges: [], emails: [], nextCollegeId: 100, nextEmailId: 1 , templates: [{
+    id: 103,
+    name: "Two Days Back-to-Back - CSA + GA Talent ID",
+    category: "initial",
+    subject: "Two Chances to See Tess Truxillo (2028) - Feb 21-22 in Charlotte",
+    body: `Dear Coach {{coach_last_name}},
+
+I wanted to reach out with an exciting opportunity to watch me play on back-to-back days in Charlotte this February:
+
+🗓️ DOUBLE OPPORTUNITY IN CHARLOTTE:
+
+Day 1 - Friday, February 21, 2026
+Charlotte Soccer Academy - Girls Winter College ID Camp
+Location: Charlotte, NC
+Register: https://charlottesocceracademy.com/college-id-camps/
+
+Day 2 - Sunday, February 22, 2026  
+Girls Academy Mid-Atlantic Conference South Division Talent ID Event
+Location: Charlotte Metro Area (Invite-Only Event)
+College Coach Registration: https://app.smartsheet.com/b/form/cbebde7ea8c64996911794bc899b1e91
+
+I've been selected for the invite-only GA Talent ID Event on February 22nd, which brings together the top players from across the conference. The day before, I'll be competing at the Charlotte Soccer Academy camp, which offers another great opportunity to see me play.
+
+If you're planning to attend the GA Talent ID Event on Sunday, you could also catch me at the CSA camp on Friday - two evaluation opportunities in one trip to Charlotte!
+
+ABOUT ME:
+• Position: Forward / Winger / Attacking Mid
+• Class: 2028 - Charlotte Catholic HS
+• Club: Charlotte Development Academy U17/U18-19  
+• Honors: NC 4A All-Region First Team, NC 4A All-Conference First Team (Varsity as Freshman)
+• Track: School record holder 55M (7.80 sec) and 300M (42.41 sec)
+
+I'm very interested in {{school_name}}'s program and would love the opportunity to connect during either event.
+
+My highlight film and profile: {{video_1}}
+
+Thank you for considering, and I hope to see you in Charlotte!
+
+Best regards,
+Tess Truxillo
+Charlotte Catholic High School, Class of 2028
+Tess.Truxillo.Soccer@outlook.com
+(803) 833-0115`
+  }]};
 let favOnly = false;
 let selectionMode = false;
 let selectedSchools = new Set();
@@ -2360,6 +2454,72 @@ function getTempEmoji(temp) {
 // ══════════════════════════════════════════════
 // COLLEGES
 // ══════════════════════════════════════════════
+
+function emailAllCoaches(collegeId) {
+  const college = data.colleges.find(c => c.id === collegeId);
+  if (!college || !college.staff || college.staff.length === 0) {
+    alert('No coaching staff email addresses available for this school.');
+    return;
+  }
+  
+  // Build comma-separated list of coach emails
+  const emails = college.staff.map(s => s.email).filter(e => e).join(', ');
+  
+  if (!emails) {
+    alert('No coaching staff email addresses available for this school.');
+    return;
+  }
+  
+  // Open email modal with all coaches
+  const subject = `Tess Truxillo - Class of 2028 Forward/Winger Interest`;
+  const body = `Dear ${college.name} Coaching Staff,
+
+[Your message here]
+
+Best regards,
+Tess Truxillo
+Charlotte Catholic High School, Class of 2028
+Tess.Truxillo.Soccer@outlook.com
+(803) 833-0115`;
+  
+  // Create mailto link
+  const mailtoLink = `mailto:${emails}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  
+  // Open in Outlook
+  window.location.href = mailtoLink;
+}
+
+
+function renderEventBadges(college) {
+  if (!college.events || college.events.length === 0) return '';
+  
+  const badgeIcons = {
+    'csa-feb21': '🏟️',
+    'ga-talent-feb22': '⚽',
+    'winthrop-mar1': '🎯',
+    'ga-greensboro-apr': '🌟',
+    'ga-california-jun': '☀️'
+  };
+  
+  const badgeNames = {
+    'csa-feb21': 'CSA Feb 21',
+    'ga-talent-feb22': 'GA Talent ID Feb 22',
+    'winthrop-mar1': 'Winthrop Mar 1',
+    'ga-greensboro-apr': 'GA Greensboro Apr 9-13',
+    'ga-california-jun': 'GA California Jun 18-23'
+  };
+  
+  return `
+    <div class="event-badges">
+      ${college.events.map(event => `
+        <span class="event-badge ${event}">
+          ${badgeIcons[event] || '📍'} ${badgeNames[event] || event}
+        </span>
+      `).join('')}
+    </div>
+  `;
+}
+
 function renderColleges() {
   const q = document.getElementById('search').value.toLowerCase();
   const conf = document.getElementById('filter-conf').value;
