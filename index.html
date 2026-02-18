@@ -17,12 +17,6 @@
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'DM Sans',sans-serif;background:var(--gray-50);min-height:100vh;color:var(--gray-700)}
 
-  .college-grid { 
-       display: grid !important; 
-       grid-template-columns: repeat(3, 1fr) !important; 
-       gap: 18px !important; 
-   }
-
 /* HEADER */
 .header{background:var(--navy);color:white;position:relative;overflow:hidden;padding:24px 32px 20px}
 .header::before{content:'';position:absolute;top:-80px;right:-80px;width:320px;height:320px;background:var(--pink);opacity:.12;border-radius:50%}
@@ -88,7 +82,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--gray-50);min-height:100vh
 .btn-success{background:var(--success);color:white}.btn-success:hover{background:#38a169}
 
 /* COLLEGE GRID */
-
+.college-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:18px}
 
 /* COLLEGE CARD */
 .college-card{background:white;border-radius:16px;border:1.5px solid var(--gray-100);overflow:hidden;transition:transform .2s,box-shadow .2s;position:relative}
@@ -242,8 +236,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--gray-50);min-height:100vh
 .remove-staff-btn{background:none;border:1px solid var(--danger);color:var(--danger);border-radius:6px;padding:8px;cursor:pointer;font-size:.9em;margin-top:0;height:38px}
 
 /* RESPONSIVE */
-@media(max-width:699px){
-  
+@media(max-width:600px){
+  .college-grid{grid-template-columns:1fr}
   .form-row{grid-template-columns:1fr}
   .staff-builder-row{grid-template-columns:1fr 1fr;grid-template-rows:auto auto}
   .header-stats{display:none}
@@ -877,7 +871,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--gray-50);min-height:100vh
           <input class="form-input" id="as-drive" type="text" placeholder="e.g. ~2.5 hrs">
         </div>
       </div>
-
+      <div class="form-group">
+        <label class="form-label">Logo URL (optional)</label>
+        <input class="form-input" id="as-logo" type="url" placeholder="https://example.com/logo.png">
+        <div style="font-size:.75em;color:var(--gray-500);margin-top:4px">Paste a direct link to the school's logo image</div>
+      </div>
       <div class="form-group">
         <label class="form-label">ID Camp Dates</label>
         <input class="form-input" id="as-camps" type="text" placeholder="e.g. June 10-12, July 15-17 (comma separated)">
@@ -904,7 +902,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--gray-50);min-height:100vh
         <button class="btn" id="delete-school-btn" onclick="deleteSchool()" style="background:var(--danger);color:white;margin-right:auto;display:none">🗑️ Delete School</button>
         <button class="btn btn-outline" onclick="closeModal('modal-add-school')">Cancel</button>
         <button class="btn btn-primary" id="as-save-btn" onclick="saveSchool()">Add School</button>
-        <button class="btn" onclick="researchTransferData(editingCollegeId || null)" style="background:#2196F3;color:white">🔍 Research Transfer Data</button>
       </div>
     </div>
   </div>
@@ -2602,6 +2599,7 @@ function cardHTML(c) {
   return `<div class="college-card" id="card-${c.id}">
     <div class="card-header">
       ${selectionMode ? `<input type="checkbox" ${selectedSchools.has(c.id) ? 'checked' : ''} onchange="toggleSchoolSelection(${c.id})" style="width:20px;height:20px;margin-right:12px;cursor:pointer">` : ''}
+      ${c.logoUrl ? `<img src="${c.logoUrl}" alt="${c.name} logo" style="width:40px;height:40px;object-fit:contain;margin-right:12px;border-radius:4px;background:white;padding:2px" onerror="this.style.display='none'">` : ''}
       <div>
         <div class="card-name">${c.name}</div>
         <div class="card-location">📍 ${c.location} · 🚗 ${c.drive||'?'}</div>
@@ -2689,7 +2687,6 @@ function cardHTML(c) {
       <textarea class="notes-input" placeholder="Notes…" onblur="saveNote(${c.id},this.value)">${c.notes||''}</textarea>
     </div>
     <div class="card-actions">
-      <button class="btn btn-sm" onclick="openTransferAnalysis(${c.id})" style="background:${c.transferAnalysis?'#e8f5e9':'#f5f5f5'};color:${c.transferAnalysis?'var(--success)':'var(--gray-600)'};border:1px solid ${c.transferAnalysis?'var(--success)':'var(--gray-300)'}">📊 Transfers</button>
       <button class="btn btn-sm btn-primary" onclick="openLogEmail(${c.id})">+ Log Email</button>
       <button class="btn btn-sm btn-outline" onclick="openEditSchool(${c.id})">✏️ Edit</button>
     </div>
@@ -2914,7 +2911,7 @@ function openAddSchoolModal() {
   document.getElementById('as-location').value='';
   document.getElementById('as-conference').value='ACC';
   document.getElementById('as-drive').value='';
-  
+  document.getElementById('as-logo').value='';
   document.getElementById('as-camps').value='';
   document.getElementById('as-notes').value='';
   const sb = document.getElementById('staff-builder');
@@ -2938,7 +2935,7 @@ function openEditSchool(id) {
   document.getElementById('as-location').value = c.location||'';
   document.getElementById('as-conference').value = c.conference||'ACC';
   document.getElementById('as-drive').value = c.drive||'';
-  
+  document.getElementById('as-logo').value = c.logoUrl||'';
   document.getElementById('as-camps').value = (c.camps||[]).map(x=>x.date).filter(x=>!x.startsWith('2026 dates')).join(', ');
   document.getElementById('as-notes').value = c.notes||'';
   const sb = document.getElementById('staff-builder');
@@ -2996,7 +2993,7 @@ function saveSchool() {
       c.conference=document.getElementById('as-conference').value;
       c.drive=document.getElementById('as-drive').value.trim();
       c.notes=document.getElementById('as-notes').value.trim();
-      
+      c.logoUrl=document.getElementById('as-logo').value.trim();
       c.staff=staff; c.camps=camps;
     }
   } else {
@@ -3006,7 +3003,7 @@ function saveSchool() {
       conference: document.getElementById('as-conference').value,
       drive: document.getElementById('as-drive').value.trim(),
       notes: document.getElementById('as-notes').value.trim(),
-      
+      logoUrl: document.getElementById('as-logo').value.trim(),
       favorite: false, contactStatus: 'not-contacted',
       staff, camps
     });
@@ -3120,25 +3117,6 @@ function getAllCalendarEvents() {
       });
     }
   });
-
-  // Auto-pull: High School games
-  if (data.hsGames && data.hsGames.length > 0) {
-    data.hsGames.forEach((game, idx) => {
-      // Parse the game date (format: "Feb 26, 2026")
-      const parsed = parseCampDate(game.date);
-      if (parsed) {
-        events.push({
-          id: `auto-hs-${idx}`,
-          title: `HS: ${game.away ? '@' : 'vs'} ${game.opponent}`,
-          type: 'custom',
-          start: parsed.start,
-          end: parsed.start,
-          auto: true,
-          notes: `${game.time} • ${game.location}${game.event ? ' • ' + game.event : ''}`
-        });
-      }
-    });
-  }
 
   return events;
 }
@@ -4323,7 +4301,6 @@ function showView(v) {
 // INIT
 // ══════════════════════════════════════════════
 loadData();
-  
 if (!data.calEvents) data.calEvents = [];
 if (!data.actions) data.actions = [];
 if (!data.nextActionId) data.nextActionId = 1;
@@ -4969,289 +4946,6 @@ function renderHSGames() {
   `).join('');
 }
 
-
-
-function openTransferAnalysis(collegeId) {
-  const college = data.colleges.find(c => c.id === collegeId);
-  if (!college) return;
-  
-  document.getElementById('transfer-modal-title').textContent = `${college.name} - Transfer Analysis`;
-  
-  const analysis = college.transferAnalysis || {};
-  
-  let content = '<div style="font-size:.9em">';
-  
-  // Roster Breakdown
-  if (analysis.rosterBreakdown) {
-    const r = analysis.rosterBreakdown;
-    content += `
-      <div style="margin-bottom:20px;padding:12px;background:var(--gray-50);border-radius:8px">
-        <h4 style="margin:0 0 10px 0;color:var(--navy)">📋 Current Roster Breakdown</h4>
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;text-align:center">
-          <div>
-            <div style="font-size:1.5em;font-weight:700;color:var(--success)">${r.freshmen || 0}</div>
-            <div style="font-size:.75em;color:var(--gray-600)">Freshmen</div>
-          </div>
-          <div>
-            <div style="font-size:1.5em;font-weight:700;color:var(--primary)">${r.sophomores || 0}</div>
-            <div style="font-size:.75em;color:var(--gray-600)">Sophomores</div>
-          </div>
-          <div>
-            <div style="font-size:1.5em;font-weight:700;color:var(--warning)">${r.juniors || 0}</div>
-            <div style="font-size:.75em;color:var(--gray-600)">Juniors</div>
-          </div>
-          <div>
-            <div style="font-size:1.5em;font-weight:700;color:var(--danger)">${r.seniors || 0}</div>
-            <div style="font-size:.75em;color:var(--gray-600)">Seniors</div>
-          </div>
-        </div>
-        <div style="margin-top:10px;text-align:center;font-weight:600">Total: ${(r.freshmen||0)+(r.sophomores||0)+(r.juniors||0)+(r.seniors||0)} players</div>
-      </div>
-    `;
-  }
-  
-  // Transfer Activity
-  if (analysis.transferData) {
-    const t = analysis.transferData;
-    content += `
-      <div style="margin-bottom:20px;padding:12px;background:var(--gray-50);border-radius:8px">
-        <h4 style="margin:0 0 10px 0;color:var(--navy)">🔄 Transfer Activity (${t.years || 'Recent Years'})</h4>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px">
-          <div style="text-align:center;padding:10px;background:white;border-radius:6px">
-            <div style="font-size:2em;font-weight:700;color:var(--success)">${t.transfersIn || 0}</div>
-            <div style="font-size:.8em;color:var(--gray-600)">Transfers IN</div>
-          </div>
-          <div style="text-align:center;padding:10px;background:white;border-radius:6px">
-            <div style="font-size:2em;font-weight:700;color:${(t.transfersOut||0) > 8 ? 'var(--danger)' : 'var(--primary)'}">${t.transfersOut || 0}</div>
-            <div style="font-size:.8em;color:var(--gray-600)">Transfers OUT</div>
-          </div>
-        </div>
-        ${t.proPlayers ? `<div style="margin-top:10px;padding:8px;background:#e8f5e9;border-radius:6px;font-size:.85em;text-align:center">⭐ ${t.proPlayers} players went PRO</div>` : ''}
-      </div>
-    `;
-  }
-  
-  // Flags
-  if (analysis.flags) {
-    content += `<div style="margin-bottom:20px">`;
-    
-    if (analysis.flags.red && analysis.flags.red.length > 0) {
-      content += `
-        <div style="margin-bottom:10px;padding:10px;background:#ffebee;border-left:3px solid var(--danger);border-radius:4px">
-          <div style="font-weight:700;color:var(--danger);margin-bottom:6px">🚩 Red Flags:</div>
-          <ul style="margin:0;padding-left:20px;font-size:.85em">
-            ${analysis.flags.red.map(f => `<li>${f}</li>`).join('')}
-          </ul>
-        </div>
-      `;
-    }
-    
-    if (analysis.flags.yellow && analysis.flags.yellow.length > 0) {
-      content += `
-        <div style="margin-bottom:10px;padding:10px;background:#fff8e1;border-left:3px solid var(--warning);border-radius:4px">
-          <div style="font-weight:700;color:#f57c00;margin-bottom:6px">⚠️ Yellow Flags:</div>
-          <ul style="margin:0;padding-left:20px;font-size:.85em">
-            ${analysis.flags.yellow.map(f => `<li>${f}</li>`).join('')}
-          </ul>
-        </div>
-      `;
-    }
-    
-    if (analysis.flags.green && analysis.flags.green.length > 0) {
-      content += `
-        <div style="padding:10px;background:#e8f5e9;border-left:3px solid var(--success);border-radius:4px">
-          <div style="font-weight:700;color:var(--success);margin-bottom:6px">✅ Green Flags:</div>
-          <ul style="margin:0;padding-left:20px;font-size:.85em">
-            ${analysis.flags.green.map(f => `<li>${f}</li>`).join('')}
-          </ul>
-        </div>
-      `;
-    }
-    
-    content += `</div>`;
-  }
-  
-  // Recommendation
-  if (analysis.recommendation) {
-    const rec = analysis.recommendation;
-    const colors = {
-      'GREEN': {bg: '#e8f5e9', border: 'var(--success)', text: 'var(--success)', emoji: '✅'},
-      'YELLOW': {bg: '#fff8e1', border: '#f57c00', text: '#f57c00', emoji: '⚠️'},
-      'RED': {bg: '#ffebee', border: 'var(--danger)', text: 'var(--danger)', emoji: '🚩'}
-    };
-    const c = colors[rec.status] || colors.GREEN;
-    
-    content += `
-      <div style="padding:15px;background:${c.bg};border:2px solid ${c.border};border-radius:8px;margin-bottom:15px">
-        <div style="font-size:1.1em;font-weight:700;color:${c.text};margin-bottom:8px">${c.emoji} ${rec.status} LIGHT - ${rec.title}</div>
-        <div style="font-size:.9em;line-height:1.5">${rec.summary}</div>
-      </div>
-    `;
-  }
-  
-  // Notes
-  if (analysis.notes) {
-    content += `
-      <div style="padding:12px;background:var(--gray-50);border-radius:6px;font-size:.85em;line-height:1.6">
-        <strong>Additional Notes:</strong><br>${analysis.notes}
-      </div>
-    `;
-  }
-  
-  if (!analysis.rosterBreakdown && !analysis.transferData) {
-    content += '<div style="text-align:center;padding:40px;color:var(--gray-500)">No transfer analysis data available yet.</div>';
-  }
-  
-  content += '</div>';
-  
-  document.getElementById('transfer-modal-content').innerHTML = content;
-  document.getElementById('modal-transfer-analysis').classList.add('active');
-}
-
-
-// Populate UNC Chapel Hill transfer analysis (example)
-function populateUNCTransferData() {
-  const unc = data.colleges.find(c => c.name === "UNC Chapel Hill");
-  if (!unc) {
-    alert("UNC Chapel Hill not found in schools");
-    return;
-  }
-  
-  unc.transferAnalysis = {
-    rosterBreakdown: {
-      freshmen: 4,
-      sophomores: 7,
-      juniors: 9,
-      seniors: 7
-    },
-    transferData: {
-      years: "2023-2025",
-      transfersIn: 8,
-      transfersOut: 9,
-      proPlayers: 6
-    },
-    flags: {
-      yellow: [
-        "Massive 2023-24 turnover (20 of 33 players left)",
-        "Coaching change from Anson Dorrance to Damon Nahas",
-        "Heavy transfer portal use (5+ transfers annually)"
-      ],
-      green: [
-        "#1 Ranked Recruiting Class for 2026 (12 players)",
-        "6 players left for PRO careers (positive sign!)",
-        "Won National Championship in 2025 under new coach",
-        "23 NCAA national championships (most successful program)",
-        "Players develop well - many go pro"
-      ]
-    },
-    recommendation: {
-      status: "GREEN",
-      title: "Strong Program - Safe Bet",
-      summary: "UNC had ONE bad year of turnover (2023-24) due to legendary coach retirement. This is NORMAL when a 40-year coach retires. New coach Damon Nahas won national championship in year 2. By the time Tess arrives (2028), program will be fully stable with 4+ years under Nahas."
-    },
-    notes: "Questions to ask coaches: (1) What's typical roster size? (2) How many 2024 freshmen still with program? (3) Philosophy on underclassman playing time? (4) How has transition from Dorrance gone?"
-  };
-  
-  saveData();
-  
-  // Duke transfer data
-  const duke = data.colleges.find(c => c.name === "Duke University");
-  if (duke && !duke.transferAnalysis) {
-    duke.transferAnalysis = {
-      rosterBreakdown: {freshmen: 7, sophomores: 6, juniors: 8, seniors: 6},
-      transferData: {years: "2023-2025", transfersIn: 8, transfersOut: 5, proPlayers: 5},
-      flags: {
-        yellow: ["Coaching change 2025", "5 to NWSL", "Heavy graduate transfers"],
-        green: ["College Cup 2024", "ACC Champions", "#1 seed NCAA", "Players go pro", "Hall transition smooth"]
-      },
-      recommendation: {
-        status: "GREEN", title: "Elite - Transition Going Well",
-        summary: "Rebounded from poor 2023 to College Cup 2024. New coach promoted from within, won immediately. Players leave for PRO, not portal. Stable by 2028."
-      },
-      notes: "Ask: Playing time distribution? Hall vs Church philosophy?"
-    };
-    saveData();
-  }
-  
-  // Wake Forest transfer data
-  const wake = data.colleges.find(c => c.name === "Wake Forest University");
-  if (wake && !wake.transferAnalysis) {
-    wake.transferAnalysis = {
-      rosterBreakdown: {freshmen: 5, sophomores: 8, juniors: 7, seniors: 6},
-      transferData: {years: "2023-2025", transfersIn: 4, transfersOut: 7, proPlayers: 7},
-      flags: {
-        green: ["National Finalists 2024", "Beat #1 & #2 back-to-back", "Coach da Luz: 23 NCAA tournaments", "7 went PRO", "Elite home record"]
-      },
-      recommendation: {
-        status: "GREEN", title: "Elite - National Finalist",
-        summary: "Best season ever. National Championship game. Players graduate and go PRO. Legendary coach. Very stable program."
-      },
-      notes: "Ask: Freshman playing time? Replacing 7 pros? NWSL pathway?"
-    };
-    saveData();
-  }
-  
-  // NC State transfer data
-  const ncstate = data.colleges.find(c => c.name === "NC State University");
-  if (ncstate && !ncstate.transferAnalysis) {
-    ncstate.transferAnalysis = {
-      rosterBreakdown: {freshmen: 4, sophomores: 2, juniors: 8, seniors: 11},
-      transferData: {years: "2023-2025", transfersIn: 11, transfersOut: 8, proPlayers: 0},
-      flags: {
-        red: ["Poor 2024: 4-10-4", "New coach Dec 2024", "Heavy turnover"],
-        green: ["Higgins has track record", "International recruiting"]
-      },
-      recommendation: {
-        status: "YELLOW", title: "Rebuilding - Wait & See",
-        summary: "Two rough seasons. New coach/staff Dec 2024. Heavy roster rebuild. Could be stable by 2028 or risky. Tess would be part of rebuild."
-      },
-      notes: "Ask: 3-year plan? Retention of current players?"
-    };
-    saveData();
-  }
-  renderColleges();
-  alert("✅ UNC transfer analysis data added! Click the green '📊 Transfers' button on UNC's card to view.");
-}
-
-
-async function researchTransferData(collegeId) {
-  let college;
-  if (collegeId) {
-    college = data.colleges.find(c => c.id === collegeId);
-  } else {
-    const name = document.getElementById('as-name').value.trim();
-    if (!name) {
-      alert('Please enter a school name first');
-      return;
-    }
-    college = data.colleges.find(c => c.name === name);
-    if (!college) {
-      alert('School not found. Please save the school first, then research transfer data.');
-      return;
-    }
-  }
-  
-  if (!college) {
-    alert('School not found');
-    return;
-  }
-  
-  // Show loading state
-  const btn = event.target;
-  const originalText = btn.innerHTML;
-  btn.innerHTML = '⏳ Researching...';
-  btn.disabled = true;
-  
-  try {
-    // This would integrate with Claude API to research the school
-    // For now, show instructions
-    alert(`Transfer Data Research for ${college.name}\n\nTo research this school:\n\n1. Ask Claude: "Research transfer data for ${college.name} women's soccer"\n2. Claude will analyze:\n   • Roster breakdown by class year\n   • Transfer IN/OUT counts\n   • Red/Yellow/Green flags\n   • Program stability\n   • Recommendation\n\n3. Claude will add the data to the CRM automatically!`);
-    
-  } finally {
-    btn.innerHTML = originalText;
-    btn.disabled = false;
-  }
-}
 
 </script>
 
@@ -6176,235 +5870,6 @@ function renderHSGames() {
 }
 
 
-
-// Helper: Add logos to schools (run once on load)
-
-function openTransferAnalysis(collegeId) {
-  const college = data.colleges.find(c => c.id === collegeId);
-  if (!college) return;
-  
-  document.getElementById('transfer-modal-title').textContent = `${college.name} - Transfer Analysis`;
-  
-  const analysis = college.transferAnalysis || {};
-  
-  let content = '<div style="font-size:.9em">';
-  
-  // Roster Breakdown
-  if (analysis.rosterBreakdown) {
-    const r = analysis.rosterBreakdown;
-    content += `
-      <div style="margin-bottom:20px;padding:12px;background:var(--gray-50);border-radius:8px">
-        <h4 style="margin:0 0 10px 0;color:var(--navy)">📋 Current Roster Breakdown</h4>
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;text-align:center">
-          <div>
-            <div style="font-size:1.5em;font-weight:700;color:var(--success)">${r.freshmen || 0}</div>
-            <div style="font-size:.75em;color:var(--gray-600)">Freshmen</div>
-          </div>
-          <div>
-            <div style="font-size:1.5em;font-weight:700;color:var(--primary)">${r.sophomores || 0}</div>
-            <div style="font-size:.75em;color:var(--gray-600)">Sophomores</div>
-          </div>
-          <div>
-            <div style="font-size:1.5em;font-weight:700;color:var(--warning)">${r.juniors || 0}</div>
-            <div style="font-size:.75em;color:var(--gray-600)">Juniors</div>
-          </div>
-          <div>
-            <div style="font-size:1.5em;font-weight:700;color:var(--danger)">${r.seniors || 0}</div>
-            <div style="font-size:.75em;color:var(--gray-600)">Seniors</div>
-          </div>
-        </div>
-        <div style="margin-top:10px;text-align:center;font-weight:600">Total: ${(r.freshmen||0)+(r.sophomores||0)+(r.juniors||0)+(r.seniors||0)} players</div>
-      </div>
-    `;
-  }
-  
-  // Transfer Activity
-  if (analysis.transferData) {
-    const t = analysis.transferData;
-    content += `
-      <div style="margin-bottom:20px;padding:12px;background:var(--gray-50);border-radius:8px">
-        <h4 style="margin:0 0 10px 0;color:var(--navy)">🔄 Transfer Activity (${t.years || 'Recent Years'})</h4>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px">
-          <div style="text-align:center;padding:10px;background:white;border-radius:6px">
-            <div style="font-size:2em;font-weight:700;color:var(--success)">${t.transfersIn || 0}</div>
-            <div style="font-size:.8em;color:var(--gray-600)">Transfers IN</div>
-          </div>
-          <div style="text-align:center;padding:10px;background:white;border-radius:6px">
-            <div style="font-size:2em;font-weight:700;color:${(t.transfersOut||0) > 8 ? 'var(--danger)' : 'var(--primary)'}">${t.transfersOut || 0}</div>
-            <div style="font-size:.8em;color:var(--gray-600)">Transfers OUT</div>
-          </div>
-        </div>
-        ${t.proPlayers ? `<div style="margin-top:10px;padding:8px;background:#e8f5e9;border-radius:6px;font-size:.85em;text-align:center">⭐ ${t.proPlayers} players went PRO</div>` : ''}
-      </div>
-    `;
-  }
-  
-  // Flags
-  if (analysis.flags) {
-    content += `<div style="margin-bottom:20px">`;
-    
-    if (analysis.flags.red && analysis.flags.red.length > 0) {
-      content += `
-        <div style="margin-bottom:10px;padding:10px;background:#ffebee;border-left:3px solid var(--danger);border-radius:4px">
-          <div style="font-weight:700;color:var(--danger);margin-bottom:6px">🚩 Red Flags:</div>
-          <ul style="margin:0;padding-left:20px;font-size:.85em">
-            ${analysis.flags.red.map(f => `<li>${f}</li>`).join('')}
-          </ul>
-        </div>
-      `;
-    }
-    
-    if (analysis.flags.yellow && analysis.flags.yellow.length > 0) {
-      content += `
-        <div style="margin-bottom:10px;padding:10px;background:#fff8e1;border-left:3px solid var(--warning);border-radius:4px">
-          <div style="font-weight:700;color:#f57c00;margin-bottom:6px">⚠️ Yellow Flags:</div>
-          <ul style="margin:0;padding-left:20px;font-size:.85em">
-            ${analysis.flags.yellow.map(f => `<li>${f}</li>`).join('')}
-          </ul>
-        </div>
-      `;
-    }
-    
-    if (analysis.flags.green && analysis.flags.green.length > 0) {
-      content += `
-        <div style="padding:10px;background:#e8f5e9;border-left:3px solid var(--success);border-radius:4px">
-          <div style="font-weight:700;color:var(--success);margin-bottom:6px">✅ Green Flags:</div>
-          <ul style="margin:0;padding-left:20px;font-size:.85em">
-            ${analysis.flags.green.map(f => `<li>${f}</li>`).join('')}
-          </ul>
-        </div>
-      `;
-    }
-    
-    content += `</div>`;
-  }
-  
-  // Recommendation
-  if (analysis.recommendation) {
-    const rec = analysis.recommendation;
-    const colors = {
-      'GREEN': {bg: '#e8f5e9', border: 'var(--success)', text: 'var(--success)', emoji: '✅'},
-      'YELLOW': {bg: '#fff8e1', border: '#f57c00', text: '#f57c00', emoji: '⚠️'},
-      'RED': {bg: '#ffebee', border: 'var(--danger)', text: 'var(--danger)', emoji: '🚩'}
-    };
-    const c = colors[rec.status] || colors.GREEN;
-    
-    content += `
-      <div style="padding:15px;background:${c.bg};border:2px solid ${c.border};border-radius:8px;margin-bottom:15px">
-        <div style="font-size:1.1em;font-weight:700;color:${c.text};margin-bottom:8px">${c.emoji} ${rec.status} LIGHT - ${rec.title}</div>
-        <div style="font-size:.9em;line-height:1.5">${rec.summary}</div>
-      </div>
-    `;
-  }
-  
-  // Notes
-  if (analysis.notes) {
-    content += `
-      <div style="padding:12px;background:var(--gray-50);border-radius:6px;font-size:.85em;line-height:1.6">
-        <strong>Additional Notes:</strong><br>${analysis.notes}
-      </div>
-    `;
-  }
-  
-  if (!analysis.rosterBreakdown && !analysis.transferData) {
-    content += '<div style="text-align:center;padding:40px;color:var(--gray-500)">No transfer analysis data available yet.</div>';
-  }
-  
-  content += '</div>';
-  
-  document.getElementById('transfer-modal-content').innerHTML = content;
-  document.getElementById('modal-transfer-analysis').classList.add('active');
-}
-
-
-// Populate UNC Chapel Hill transfer analysis (example)
-function populateUNCTransferData() {
-  const unc = data.colleges.find(c => c.name === "UNC Chapel Hill");
-  if (!unc) {
-    alert("UNC Chapel Hill not found in schools");
-    return;
-  }
-  
-  unc.transferAnalysis = {
-    rosterBreakdown: {
-      freshmen: 4,
-      sophomores: 7,
-      juniors: 9,
-      seniors: 7
-    },
-    transferData: {
-      years: "2023-2025",
-      transfersIn: 8,
-      transfersOut: 9,
-      proPlayers: 6
-    },
-    flags: {
-      yellow: [
-        "Massive 2023-24 turnover (20 of 33 players left)",
-        "Coaching change from Anson Dorrance to Damon Nahas",
-        "Heavy transfer portal use (5+ transfers annually)"
-      ],
-      green: [
-        "#1 Ranked Recruiting Class for 2026 (12 players)",
-        "6 players left for PRO careers (positive sign!)",
-        "Won National Championship in 2025 under new coach",
-        "23 NCAA national championships (most successful program)",
-        "Players develop well - many go pro"
-      ]
-    },
-    recommendation: {
-      status: "GREEN",
-      title: "Strong Program - Safe Bet",
-      summary: "UNC had ONE bad year of turnover (2023-24) due to legendary coach retirement. This is NORMAL when a 40-year coach retires. New coach Damon Nahas won national championship in year 2. By the time Tess arrives (2028), program will be fully stable with 4+ years under Nahas."
-    },
-    notes: "Questions to ask coaches: (1) What's typical roster size? (2) How many 2024 freshmen still with program? (3) Philosophy on underclassman playing time? (4) How has transition from Dorrance gone?"
-  };
-  
-  saveData();
-  renderColleges();
-  alert("✅ UNC transfer analysis data added! Click the green '📊 Transfers' button on UNC's card to view.");
-}
-
-
-async function researchTransferData(collegeId) {
-  let college;
-  if (collegeId) {
-    college = data.colleges.find(c => c.id === collegeId);
-  } else {
-    const name = document.getElementById('as-name').value.trim();
-    if (!name) {
-      alert('Please enter a school name first');
-      return;
-    }
-    college = data.colleges.find(c => c.name === name);
-    if (!college) {
-      alert('School not found. Please save the school first, then research transfer data.');
-      return;
-    }
-  }
-  
-  if (!college) {
-    alert('School not found');
-    return;
-  }
-  
-  // Show loading state
-  const btn = event.target;
-  const originalText = btn.innerHTML;
-  btn.innerHTML = '⏳ Researching...';
-  btn.disabled = true;
-  
-  try {
-    // This would integrate with Claude API to research the school
-    // For now, show instructions
-    alert(`Transfer Data Research for ${college.name}\n\nTo research this school:\n\n1. Ask Claude: "Research transfer data for ${college.name} women's soccer"\n2. Claude will analyze:\n   • Roster breakdown by class year\n   • Transfer IN/OUT counts\n   • Red/Yellow/Green flags\n   • Program stability\n   • Recommendation\n\n3. Claude will add the data to the CRM automatically!`);
-    
-  } finally {
-    btn.innerHTML = originalText;
-    btn.disabled = false;
-  }
-}
-
 </script>
 
 
@@ -6636,20 +6101,6 @@ async function researchTransferData(collegeId) {
         </div>
         
       </form>
-    </div>
-  </div>
-</div>
-
-
-<!-- TRANSFER ANALYSIS MODAL -->
-<div class="modal-overlay" id="modal-transfer-analysis">
-  <div class="modal" style="max-width:700px">
-    <div class="modal-header">
-      <span class="modal-title" id="transfer-modal-title">Transfer & Roster Analysis</span>
-      <button class="modal-close" onclick="closeModal('modal-transfer-analysis')">✕</button>
-    </div>
-    <div class="modal-body">
-      <div id="transfer-modal-content"></div>
     </div>
   </div>
 </div>
