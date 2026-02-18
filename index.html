@@ -2644,22 +2644,23 @@ function cardHTML(c) {
           <button class="btn btn-sm" onclick="openAddCampModal(${c.id})" style="font-size:.75em;padding:4px 8px;background:var(--primary);color:white">➕ Add Camp</button>
         </div>
         ${(c.camps||[]).length?`
-        ${(c.camps||[]).map((camp, campIndex)=>`
-          <div class="camp-item" style="display:flex;justify-content:space-between;align-items:center">
-            <div style="display:flex;align-items:center;gap:8px;flex:1">
-              <span class="camp-dot ${camp.status}"></span>
-              <span class="camp-text">${camp.date}${camp.name?` — ${camp.name}`:''}</span>
-              ${campStatusIcon(camp.status)}
-            </div>
-            <div style="display:flex;gap:4px;margin-left:8px">
-              ${camp.link?`<a href="${camp.link}" target="_blank" class="btn btn-sm" style="font-size:.7em;padding:2px 8px;background:var(--primary);color:white;text-decoration:none">Register</a>`:''}
-              <button class="btn btn-sm" onclick="deleteCamp(${c.id}, ${campIndex})" style="font-size:.7em;padding:2px 6px;background:var(--danger);color:white">✕</button>
-            </div>
-          </div>
-          <div style="font-size:.7em;color:var(--gray-500);padding-left:14px;margin-bottom:2px">${camp.source||''}</div>
-        `).join('')}
-      </div>`:''}
-
+          <div class="camps-container">
+            ${(c.camps||[]).map((camp, campIndex)=>`
+              <div class="camp-item" style="display:flex;justify-content:space-between;align-items:center">
+                <div style="display:flex;align-items:center;gap:8px;flex:1">
+                  <span class="camp-dot ${camp.status}"></span>
+                  <span class="camp-text">${camp.date}${camp.name?` — ${camp.name}`:''}</span>
+                  ${campStatusIcon(camp.status)}
+                </div>
+                <div style="display:flex;gap:4px;margin-left:8px">
+                  ${camp.link?`<a href="${camp.link}" target="_blank" class="btn btn-sm" style="font-size:.7em;padding:2px 8px;background:var(--primary);color:white;text-decoration:none">Register</a>`:''}
+                  <button class="btn btn-sm" onclick="deleteCamp(${c.id}, ${campIndex})" style="font-size:.7em;padding:2px 6px;background:var(--danger);color:white">✕</button>
+                </div>
+              </div>
+              <div style="font-size:.7em;color:var(--gray-500);padding-left:14px;margin-bottom:2px">${camp.source||''}</div>
+            `).join('')}
+          </div>`:'<div style="color:var(--gray-500);font-size:.85em;font-style:italic;padding:8px 0">No camps scheduled yet.</div>'}
+      </div>
       <div class="email-section">
         <div class="section-title" style="display:flex;justify-content:space-between">
           📧 Emails
