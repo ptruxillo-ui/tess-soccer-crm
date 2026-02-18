@@ -441,11 +441,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--gray-50);min-height:100vh
     <div id="next-camps" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;margin-top:4px"></div>
   </div>
   
-  <div class="dash-card">
-    <h3>🏫 Charlotte Catholic HS Games</h3>
-    <div id="hs-games-calendar" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;margin-top:4px"></div>
-  </div>
-  
   <div class="dash-row">
     <div class="dash-card">
       <h3>🕐 Recent Activity</h3>
@@ -870,11 +865,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--gray-50);min-height:100vh
           <label class="form-label">Drive Time from Charlotte</label>
           <input class="form-input" id="as-drive" type="text" placeholder="e.g. ~2.5 hrs">
         </div>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Logo URL (optional)</label>
-        <input class="form-input" id="as-logo" type="url" placeholder="https://example.com/logo.png">
-        <div style="font-size:.75em;color:var(--gray-500);margin-top:4px">Paste a direct link to the school's logo image</div>
       </div>
       <div class="form-group">
         <label class="form-label">ID Camp Dates</label>
@@ -2286,9 +2276,6 @@ function renderDashboard() {
     };
     return parseDate(a.date) - parseDate(b.date);
   });
-  // Render HS games
-  renderHSGames();
-  
   nc.innerHTML = verCamps.length ? verCamps.slice(0,20).map(x=>`
     <div style="background:white;border:1.5px solid var(--gray-100);border-radius:10px;padding:12px 14px;cursor:pointer;transition:all 0.2s" onmouseover="this.style.borderColor='var(--pink)'" onmouseout="this.style.borderColor='var(--gray-100)'" onclick="openCampDetails('${x.college}', '${x.name||'ID Camp'}', '${x.date}', '${x.campRegLink || ''}')">
       <div style="font-weight:700;color:var(--navy);font-size:.88em">${x.college}</div>
@@ -2569,14 +2556,6 @@ function renderColleges() {
     if (q && !c.name.toLowerCase().includes(q) && !c.location.toLowerCase().includes(q) && !c.conference.toLowerCase().includes(q)) return false;
     return true;
   });
-  
-  // Sort: Favorites first, then alphabetically
-  list.sort((a, b) => {
-    if (a.favorite && !b.favorite) return -1;
-    if (!a.favorite && b.favorite) return 1;
-    return a.name.localeCompare(b.name);
-  });
-  
   const grid = document.getElementById('college-grid');
   if (!list.length) { grid.innerHTML = '<div class="empty-state"><div class="es-icon">🏫</div><h3>No schools match your filters</h3></div>'; return; }
   grid.innerHTML = list.map(c => cardHTML(c)).join('');
@@ -2599,7 +2578,6 @@ function cardHTML(c) {
   return `<div class="college-card" id="card-${c.id}">
     <div class="card-header">
       ${selectionMode ? `<input type="checkbox" ${selectedSchools.has(c.id) ? 'checked' : ''} onchange="toggleSchoolSelection(${c.id})" style="width:20px;height:20px;margin-right:12px;cursor:pointer">` : ''}
-      ${c.logoUrl ? `<img src="${c.logoUrl}" alt="${c.name} logo" style="width:40px;height:40px;object-fit:contain;margin-right:12px;border-radius:4px;background:white;padding:2px" onerror="this.style.display='none'">` : ''}
       <div>
         <div class="card-name">${c.name}</div>
         <div class="card-location">📍 ${c.location} · 🚗 ${c.drive||'?'}</div>
@@ -2911,7 +2889,6 @@ function openAddSchoolModal() {
   document.getElementById('as-location').value='';
   document.getElementById('as-conference').value='ACC';
   document.getElementById('as-drive').value='';
-  document.getElementById('as-logo').value='';
   document.getElementById('as-camps').value='';
   document.getElementById('as-notes').value='';
   const sb = document.getElementById('staff-builder');
@@ -2935,7 +2912,6 @@ function openEditSchool(id) {
   document.getElementById('as-location').value = c.location||'';
   document.getElementById('as-conference').value = c.conference||'ACC';
   document.getElementById('as-drive').value = c.drive||'';
-  document.getElementById('as-logo').value = c.logoUrl||'';
   document.getElementById('as-camps').value = (c.camps||[]).map(x=>x.date).filter(x=>!x.startsWith('2026 dates')).join(', ');
   document.getElementById('as-notes').value = c.notes||'';
   const sb = document.getElementById('staff-builder');
@@ -2993,7 +2969,6 @@ function saveSchool() {
       c.conference=document.getElementById('as-conference').value;
       c.drive=document.getElementById('as-drive').value.trim();
       c.notes=document.getElementById('as-notes').value.trim();
-      c.logoUrl=document.getElementById('as-logo').value.trim();
       c.staff=staff; c.camps=camps;
     }
   } else {
@@ -3003,7 +2978,6 @@ function saveSchool() {
       conference: document.getElementById('as-conference').value,
       drive: document.getElementById('as-drive').value.trim(),
       notes: document.getElementById('as-notes').value.trim(),
-      logoUrl: document.getElementById('as-logo').value.trim(),
       favorite: false, contactStatus: 'not-contacted',
       staff, camps
     });
@@ -4890,63 +4864,6 @@ function renderShowcases() {
 }
 
 
-
-  // Initialize high school games if not present
-  if (!data.hsGames) {
-    data.hsGames = [
-      {date:"Feb 26, 2026",time:"7:00 PM",opponent:"Charlotte Latin",location:"Charlotte, NC",away:true,event:"Queen City Showcase"},
-      {date:"Feb 28, 2026",time:"12:00 PM",opponent:"Charlotte Country Day School",location:"Charlotte, NC",away:false,event:"Queen City Showcase"},
-      {date:"Mar 3, 2026",time:"7:00 PM",opponent:"Mooresville",location:"Charlotte Catholic",away:false,event:""},
-      {date:"Mar 6, 2026",time:"7:00 PM",opponent:"Myers Park",location:"Charlotte Catholic",away:false,event:""},
-      {date:"Mar 10, 2026",time:"7:00 PM",opponent:"Sun Valley",location:"Charlotte Catholic",away:false,event:"Conference"},
-      {date:"Mar 13, 2026",time:"5:30 PM",opponent:"Millbrook",location:"Wilson, NC",away:true,event:"Brittany Showcase"},
-      {date:"Mar 14, 2026",time:"11:40 AM",opponent:"Heritage",location:"Wilson, NC",away:true,event:"Brittany Showcase"},
-      {date:"Mar 17, 2026",time:"7:00 PM",opponent:"Cuthbertson",location:"Waxhaw, NC",away:true,event:"Conference"},
-      {date:"Mar 20, 2026",time:"6:00 PM",opponent:"Piedmont",location:"Monroe, NC",away:true,event:"Conference"},
-      {date:"Mar 24, 2026",time:"7:00 PM",opponent:"Weddington",location:"Matthews, NC",away:true,event:"Conference"},
-      {date:"Mar 27, 2026",time:"7:00 PM",opponent:"Porter Ridge",location:"Charlotte Catholic",away:false,event:"Conference"},
-      {date:"Mar 28, 2026",time:"2:00 PM",opponent:"T.C. Roberson",location:"Charlotte Catholic",away:false,event:""},
-      {date:"Mar 30, 2026",time:"7:00 PM",opponent:"Ballantyne Ridge",location:"Charlotte, NC",away:true,event:""},
-      {date:"Apr 14, 2026",time:"6:00 PM",opponent:"Sun Valley",location:"Monroe, NC",away:true,event:"Conference"},
-      {date:"Apr 17, 2026",time:"7:00 PM",opponent:"Marvin Ridge",location:"Waxhaw, NC",away:true,event:"Conference"},
-      {date:"Apr 21, 2026",time:"7:00 PM",opponent:"Cuthbertson",location:"Charlotte Catholic",away:false,event:"Conference"},
-      {date:"Apr 24, 2026",time:"7:00 PM",opponent:"Piedmont",location:"Charlotte Catholic",away:false,event:"Conference"},
-      {date:"Apr 28, 2026",time:"7:00 PM",opponent:"Weddington",location:"Charlotte Catholic",away:false,event:"Conference"},
-      {date:"May 1, 2026",time:"7:00 PM",opponent:"Porter Ridge",location:"Indian Trail, NC",away:true,event:"Conference"},
-      {date:"May 4, 2026",time:"7:00 PM",opponent:"Marvin Ridge",location:"Charlotte Catholic",away:false,event:"Conference"},
-      {date:"May 5, 2026",time:"7:00 PM",opponent:"Hickory Ridge",location:"Harrisburg, NC",away:true,event:""}
-    ];
-  }
-
-
-function renderHSGames() {
-  const container = document.getElementById('hs-games-calendar');
-  if (!container || !data.hsGames) return;
-  
-  // Filter for upcoming games only
-  const today = new Date();
-  const upcomingGames = data.hsGames.filter(game => {
-    const gameDate = new Date(game.date);
-    return gameDate >= today;
-  }).slice(0,10); // Show next 10 games
-  
-  if (upcomingGames.length === 0) {
-    container.innerHTML = '<div style="color:var(--gray-500);font-size:.85em;font-style:italic">No upcoming HS games</div>';
-    return;
-  }
-  
-  container.innerHTML = upcomingGames.map(game => `
-    <div style="background:white;border:1.5px solid var(--gray-100);border-radius:10px;padding:12px 14px;transition:all 0.2s" onmouseover="this.style.borderColor='var(--pink)'" onmouseout="this.style.borderColor='var(--gray-100)'">
-      <div style="font-weight:700;color:var(--navy);font-size:.88em">${game.away?'@':''} ${game.opponent}</div>
-      ${game.event?`<div style="font-size:.75em;color:var(--pink);font-weight:600">${game.event}</div>`:''}
-      <div style="font-size:.85em;font-weight:600;color:var(--success);margin-top:4px">📅 ${game.date}</div>
-      <div style="font-size:.8em;color:var(--gray-600);margin-top:2px">🕐 ${game.time}</div>
-      <div style="font-size:.75em;color:var(--gray-500);margin-top:2px">📍 ${game.location}</div>
-    </div>
-  `).join('');
-}
-
-
 </script>
 
 <!-- CAMP DETAILS MODAL -->
@@ -5808,63 +5725,6 @@ function renderShowcases() {
         <a href="${s.link}" target="_blank" class="btn btn-sm btn-pink" style="text-decoration:none">${s.buttonText}</a>
         <button class="btn btn-sm" onclick="deleteShowcase(${s.id})" style="background:var(--danger);color:white;padding:4px 8px;font-size:.75em">✕</button>
       </div>
-    </div>
-  `).join('');
-}
-
-
-
-  // Initialize high school games if not present
-  if (!data.hsGames) {
-    data.hsGames = [
-      {date:"Feb 26, 2026",time:"7:00 PM",opponent:"Charlotte Latin",location:"Charlotte, NC",away:true,event:"Queen City Showcase"},
-      {date:"Feb 28, 2026",time:"12:00 PM",opponent:"Charlotte Country Day School",location:"Charlotte, NC",away:false,event:"Queen City Showcase"},
-      {date:"Mar 3, 2026",time:"7:00 PM",opponent:"Mooresville",location:"Charlotte Catholic",away:false,event:""},
-      {date:"Mar 6, 2026",time:"7:00 PM",opponent:"Myers Park",location:"Charlotte Catholic",away:false,event:""},
-      {date:"Mar 10, 2026",time:"7:00 PM",opponent:"Sun Valley",location:"Charlotte Catholic",away:false,event:"Conference"},
-      {date:"Mar 13, 2026",time:"5:30 PM",opponent:"Millbrook",location:"Wilson, NC",away:true,event:"Brittany Showcase"},
-      {date:"Mar 14, 2026",time:"11:40 AM",opponent:"Heritage",location:"Wilson, NC",away:true,event:"Brittany Showcase"},
-      {date:"Mar 17, 2026",time:"7:00 PM",opponent:"Cuthbertson",location:"Waxhaw, NC",away:true,event:"Conference"},
-      {date:"Mar 20, 2026",time:"6:00 PM",opponent:"Piedmont",location:"Monroe, NC",away:true,event:"Conference"},
-      {date:"Mar 24, 2026",time:"7:00 PM",opponent:"Weddington",location:"Matthews, NC",away:true,event:"Conference"},
-      {date:"Mar 27, 2026",time:"7:00 PM",opponent:"Porter Ridge",location:"Charlotte Catholic",away:false,event:"Conference"},
-      {date:"Mar 28, 2026",time:"2:00 PM",opponent:"T.C. Roberson",location:"Charlotte Catholic",away:false,event:""},
-      {date:"Mar 30, 2026",time:"7:00 PM",opponent:"Ballantyne Ridge",location:"Charlotte, NC",away:true,event:""},
-      {date:"Apr 14, 2026",time:"6:00 PM",opponent:"Sun Valley",location:"Monroe, NC",away:true,event:"Conference"},
-      {date:"Apr 17, 2026",time:"7:00 PM",opponent:"Marvin Ridge",location:"Waxhaw, NC",away:true,event:"Conference"},
-      {date:"Apr 21, 2026",time:"7:00 PM",opponent:"Cuthbertson",location:"Charlotte Catholic",away:false,event:"Conference"},
-      {date:"Apr 24, 2026",time:"7:00 PM",opponent:"Piedmont",location:"Charlotte Catholic",away:false,event:"Conference"},
-      {date:"Apr 28, 2026",time:"7:00 PM",opponent:"Weddington",location:"Charlotte Catholic",away:false,event:"Conference"},
-      {date:"May 1, 2026",time:"7:00 PM",opponent:"Porter Ridge",location:"Indian Trail, NC",away:true,event:"Conference"},
-      {date:"May 4, 2026",time:"7:00 PM",opponent:"Marvin Ridge",location:"Charlotte Catholic",away:false,event:"Conference"},
-      {date:"May 5, 2026",time:"7:00 PM",opponent:"Hickory Ridge",location:"Harrisburg, NC",away:true,event:""}
-    ];
-  }
-
-
-function renderHSGames() {
-  const container = document.getElementById('hs-games-calendar');
-  if (!container || !data.hsGames) return;
-  
-  // Filter for upcoming games only
-  const today = new Date();
-  const upcomingGames = data.hsGames.filter(game => {
-    const gameDate = new Date(game.date);
-    return gameDate >= today;
-  }).slice(0,10); // Show next 10 games
-  
-  if (upcomingGames.length === 0) {
-    container.innerHTML = '<div style="color:var(--gray-500);font-size:.85em;font-style:italic">No upcoming HS games</div>';
-    return;
-  }
-  
-  container.innerHTML = upcomingGames.map(game => `
-    <div style="background:white;border:1.5px solid var(--gray-100);border-radius:10px;padding:12px 14px;transition:all 0.2s" onmouseover="this.style.borderColor='var(--pink)'" onmouseout="this.style.borderColor='var(--gray-100)'">
-      <div style="font-weight:700;color:var(--navy);font-size:.88em">${game.away?'@':''} ${game.opponent}</div>
-      ${game.event?`<div style="font-size:.75em;color:var(--pink);font-weight:600">${game.event}</div>`:''}
-      <div style="font-size:.85em;font-weight:600;color:var(--success);margin-top:4px">📅 ${game.date}</div>
-      <div style="font-size:.8em;color:var(--gray-600);margin-top:2px">🕐 ${game.time}</div>
-      <div style="font-size:.75em;color:var(--gray-500);margin-top:2px">📍 ${game.location}</div>
     </div>
   `).join('');
 }
