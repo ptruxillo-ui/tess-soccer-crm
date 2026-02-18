@@ -423,17 +423,33 @@ body{font-family:'DM Sans',sans-serif;background:var(--gray-50);min-height:100vh
   
   <!-- MULTI-SCHOOL ID CAMPS BANNER -->
   <div style="background:linear-gradient(135deg,#fff5f7,#ffe8f0);border:2px solid var(--pink);border-radius:12px;padding:16px 20px;margin:20px 0">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-      <div style="display:flex;align-items:center;gap:12px">
-        <span style="font-size:1.4em">🏆</span>
-        <h3 style="margin:0;font-size:1rem;color:var(--navy);font-weight:700">Multi-School ID Showcases</h3>
-      </div>
-      <button class="btn btn-sm btn-primary" onclick="openAddShowcaseModal()" style="font-size:.8em">➕ Add Showcase</button>
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+      <span style="font-size:1.4em">🏆</span>
+      <h3 style="margin:0;font-size:1rem;color:var(--navy);font-weight:700">Multi-School ID Showcases</h3>
     </div>
     <div style="font-size:.85em;color:var(--gray-700);line-height:1.5;margin-bottom:10px">
       These ID camps feature multiple college coaches from different schools:
     </div>
-    <div id="showcases-container"></div>
+    <div style="background:white;border:1.5px solid var(--pink-light);border-radius:8px;padding:12px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px">
+      <div>
+        <div style="font-weight:700;color:var(--navy);font-size:.9em">Charlotte Soccer Academy - Girls Winter College ID Camp</div>
+        <div style="font-size:.8em;color:var(--gray-600);margin-top:2px">Multi-coach showcase event</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="font-weight:600;color:var(--success);font-size:.9em">📅 Feb 21, 2026</div>
+        <a href="https://charlottesocceracademy.com/college-id-camps/" target="_blank" class="btn btn-sm btn-pink" style="text-decoration:none">Register</a>
+      </div>
+    </div>
+    <div style="background:white;border:1.5px solid var(--pink-light);border-radius:8px;padding:12px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+      <div>
+        <div style="font-weight:700;color:var(--navy);font-size:.9em">Women's College Soccer Prospect ID Showcase</div>
+        <div style="font-size:.8em;color:var(--gray-600);margin-top:2px">Hosted at Winthrop University</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="font-weight:600;color:var(--success);font-size:.9em">📅 Mar 1, 2026</div>
+        <a href="https://www.womenscollege soccershowcases.com" target="_blank" class="btn btn-sm btn-pink" style="text-decoration:none">View Details</a>
+      </div>
+    </div>
   </div>
   
   <div class="dash-card">
@@ -2199,12 +2215,6 @@ function renderDashboard() {
   document.getElementById('hs-contacted').textContent = contacted;
   document.getElementById('hs-emails').textContent = emails;
 
-  // Render showcases
-  const showcasesContainer = document.getElementById('showcases-container');
-  if (showcasesContainer) {
-    showcasesContainer.innerHTML = renderShowcases();
-  }
-
   // Recent activity
   const ra = document.getElementById('recent-activity');
   const recent = [...data.emails].reverse().slice(0,6);
@@ -2229,50 +2239,17 @@ function renderDashboard() {
       </div>
     </div>`).join('') : '<div class="no-emails">No upcoming follow-ups.</div>';
 
-  // Next camps (including showcases)
+  // Next camps
   const nc = document.getElementById('next-camps');
   const verCamps = [];
-  
-  // Add school-specific camps
   data.colleges.forEach(c=>(c.camps||[]).forEach(camp=>{if((camp.status===CAMP_STATUS.VERIFIED || camp.status==='published' || !camp.status) && isCampUpcoming(camp.date)) verCamps.push({college:c.name,conf:c.conference,...camp})}));
-  
-  // Add multi-school showcases
-  if (data.showcases && data.showcases.length > 0) {
-    data.showcases.forEach(s => {
-      if (isCampUpcoming(s.date)) {
-        verCamps.push({
-          college: '🏆 Multi-School Showcase',
-          name: s.name,
-          date: s.date,
-          link: s.link,
-          source: 'Multi-school event',
-          campRegLink: s.link
-        });
-      }
-    });
-  }
-  
   // Sort camps chronologically by date
   verCamps.sort((a,b)=>{
     const parseDate = (d) => {
-      if (!d) return new Date(2099,0,1);
-      
-      // Handle formats like "Mar 14-15, 2026" or "Jul 10–12, 2026" or "March 22, 2026"
-      const monthMap = {
-        'Jan':0,'January':0,'Feb':1,'February':1,'Mar':2,'March':2,
-        'Apr':3,'April':3,'May':4,'Jun':5,'June':5,'Jul':6,'July':6,
-        'Aug':7,'August':7,'Sep':8,'September':8,'Oct':9,'October':9,
-        'Nov':10,'November':10,'Dec':11,'December':11
-      };
-      
-      // Try to match month and day
-      const match = d.match(/(Jan|January|Feb|February|Mar|March|Apr|April|May|Jun|June|Jul|July|Aug|August|Sep|September|Oct|October|Nov|November|Dec|December)\s+(\d+)/i);
-      if (!match) return new Date(2099,0,1);
-      
-      const month = monthMap[match[1]];
-      const day = parseInt(match[2]);
-      
-      return new Date(2026, month, day);
+      const m = d.match(/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+(\d+)/);
+      if (!m) return new Date(2099,0,1);
+      const mon = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11}[m[1]];
+      return new Date(2026, mon, parseInt(m[2]));
     };
     return parseDate(a.date) - parseDate(b.date);
   });
@@ -2624,15 +2601,12 @@ function cardHTML(c) {
         ${(c.camps||[]).length?`
         ${(c.camps||[]).map((camp, campIndex)=>`
           <div class="camp-item" style="display:flex;justify-content:space-between;align-items:center">
-            <div style="display:flex;align-items:center;gap:8px;flex:1">
+            <div style="display:flex;align-items:center;gap:8px">
               <span class="camp-dot ${camp.status}"></span>
               <span class="camp-text">${camp.date}${camp.name?` — ${camp.name}`:''}</span>
               ${campStatusIcon(camp.status)}
             </div>
-            <div style="display:flex;gap:4px;margin-left:8px">
-              ${camp.link?`<a href="${camp.link}" target="_blank" class="btn btn-sm" style="font-size:.7em;padding:2px 8px;background:var(--primary);color:white;text-decoration:none">Register</a>`:''}
-              <button class="btn btn-sm" onclick="deleteCamp(${c.id}, ${campIndex})" style="font-size:.7em;padding:2px 6px;background:var(--danger);color:white">✕</button>
-            </div>
+            <button class="btn btn-sm" onclick="deleteCamp(${c.id}, ${campIndex})" style="font-size:.7em;padding:2px 6px;background:var(--danger);color:white;margin-left:8px">✕</button>
           </div>
           <div style="font-size:.7em;color:var(--gray-500);padding-left:14px;margin-bottom:2px">${camp.source||''}</div>
         `).join('')}
@@ -4771,99 +4745,6 @@ function deleteCamp(collegeId, campIndex) {
   alert(`✅ Camp deleted from ${college.name}`);
 }
 
-
-function openAddShowcaseModal() {
-  document.getElementById('new-showcase-name').value = '';
-  document.getElementById('new-showcase-desc').value = '';
-  document.getElementById('new-showcase-date').value = '';
-  document.getElementById('new-showcase-link').value = '';
-  document.getElementById('new-showcase-btn').value = 'Register';
-  document.getElementById('modal-add-showcase').classList.add('active');
-}
-
-function saveNewShowcase(event) {
-  event.preventDefault();
-  
-  const name = document.getElementById('new-showcase-name').value.trim();
-  const desc = document.getElementById('new-showcase-desc').value.trim();
-  const date = document.getElementById('new-showcase-date').value.trim();
-  const link = document.getElementById('new-showcase-link').value.trim();
-  const btnText = document.getElementById('new-showcase-btn').value.trim() || 'Register';
-  
-  if (!data.showcases) data.showcases = [];
-  if (!data.nextShowcaseId) data.nextShowcaseId = 1;
-  
-  data.showcases.push({
-    id: data.nextShowcaseId++,
-    name: name,
-    description: desc,
-    date: date,
-    link: link,
-    buttonText: btnText
-  });
-  
-  saveData();
-  closeModal('modal-add-showcase');
-  renderDashboard();
-  
-  alert(`✅ Showcase "${name}" added!`);
-}
-
-function deleteShowcase(showcaseId) {
-  const showcase = data.showcases.find(s => s.id === showcaseId);
-  if (!showcase) return;
-  
-  if (!confirm(`Delete showcase: ${showcase.name}?`)) return;
-  
-  data.showcases = data.showcases.filter(s => s.id !== showcaseId);
-  saveData();
-  renderDashboard();
-  
-  alert(`✅ Showcase deleted!`);
-}
-
-function renderShowcases() {
-  if (!data.showcases) data.showcases = [];
-  
-  // Default showcases if none exist
-  if (data.showcases.length === 0) {
-    data.showcases = [
-      {
-        id: 1,
-        name: "Charlotte Soccer Academy - Girls Winter College ID Camp",
-        description: "Multi-coach showcase event",
-        date: "Feb 21, 2026",
-        link: "https://charlottesocceracademy.com/college-id-camps/",
-        buttonText: "Register"
-      },
-      {
-        id: 2,
-        name: "Women's College Soccer Prospect ID Showcase",
-        description: "Hosted at Winthrop University",
-        date: "Mar 1, 2026",
-        link: "https://www.womenscollege soccershowcases.com",
-        buttonText: "View Details"
-      }
-    ];
-    data.nextShowcaseId = 3;
-  }
-  
-  return data.showcases.map(s => `
-    <div style="background:white;border:1.5px solid var(--pink-light);border-radius:8px;padding:12px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px">
-      <div style="flex:1">
-        <div style="font-weight:700;color:var(--navy);font-size:.9em">${s.name}</div>
-        ${s.description?`<div style="font-size:.8em;color:var(--gray-600);margin-top:2px">${s.description}</div>`:''}
-      </div>
-      <div style="display:flex;align-items:center;gap:8px">
-        <div style="font-weight:600;color:var(--success);font-size:.9em">📅 ${s.date}</div>
-        <a href="${s.link}" target="_blank" class="btn btn-sm btn-pink" style="text-decoration:none">${s.buttonText}</a>
-        <button class="btn btn-sm" onclick="deleteShowcase(${s.id})" style="background:var(--danger);color:white;padding:4px 8px;font-size:.75em">✕</button>
-      </div>
-    </div>
-  `).join('');
-}
-
-
 </script>
 
 <!-- CAMP DETAILS MODAL -->
@@ -5637,99 +5518,6 @@ function deleteCamp(collegeId, campIndex) {
   alert(`✅ Camp deleted from ${college.name}`);
 }
 
-
-function openAddShowcaseModal() {
-  document.getElementById('new-showcase-name').value = '';
-  document.getElementById('new-showcase-desc').value = '';
-  document.getElementById('new-showcase-date').value = '';
-  document.getElementById('new-showcase-link').value = '';
-  document.getElementById('new-showcase-btn').value = 'Register';
-  document.getElementById('modal-add-showcase').classList.add('active');
-}
-
-function saveNewShowcase(event) {
-  event.preventDefault();
-  
-  const name = document.getElementById('new-showcase-name').value.trim();
-  const desc = document.getElementById('new-showcase-desc').value.trim();
-  const date = document.getElementById('new-showcase-date').value.trim();
-  const link = document.getElementById('new-showcase-link').value.trim();
-  const btnText = document.getElementById('new-showcase-btn').value.trim() || 'Register';
-  
-  if (!data.showcases) data.showcases = [];
-  if (!data.nextShowcaseId) data.nextShowcaseId = 1;
-  
-  data.showcases.push({
-    id: data.nextShowcaseId++,
-    name: name,
-    description: desc,
-    date: date,
-    link: link,
-    buttonText: btnText
-  });
-  
-  saveData();
-  closeModal('modal-add-showcase');
-  renderDashboard();
-  
-  alert(`✅ Showcase "${name}" added!`);
-}
-
-function deleteShowcase(showcaseId) {
-  const showcase = data.showcases.find(s => s.id === showcaseId);
-  if (!showcase) return;
-  
-  if (!confirm(`Delete showcase: ${showcase.name}?`)) return;
-  
-  data.showcases = data.showcases.filter(s => s.id !== showcaseId);
-  saveData();
-  renderDashboard();
-  
-  alert(`✅ Showcase deleted!`);
-}
-
-function renderShowcases() {
-  if (!data.showcases) data.showcases = [];
-  
-  // Default showcases if none exist
-  if (data.showcases.length === 0) {
-    data.showcases = [
-      {
-        id: 1,
-        name: "Charlotte Soccer Academy - Girls Winter College ID Camp",
-        description: "Multi-coach showcase event",
-        date: "Feb 21, 2026",
-        link: "https://charlottesocceracademy.com/college-id-camps/",
-        buttonText: "Register"
-      },
-      {
-        id: 2,
-        name: "Women's College Soccer Prospect ID Showcase",
-        description: "Hosted at Winthrop University",
-        date: "Mar 1, 2026",
-        link: "https://www.womenscollege soccershowcases.com",
-        buttonText: "View Details"
-      }
-    ];
-    data.nextShowcaseId = 3;
-  }
-  
-  return data.showcases.map(s => `
-    <div style="background:white;border:1.5px solid var(--pink-light);border-radius:8px;padding:12px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px">
-      <div style="flex:1">
-        <div style="font-weight:700;color:var(--navy);font-size:.9em">${s.name}</div>
-        ${s.description?`<div style="font-size:.8em;color:var(--gray-600);margin-top:2px">${s.description}</div>`:''}
-      </div>
-      <div style="display:flex;align-items:center;gap:8px">
-        <div style="font-weight:600;color:var(--success);font-size:.9em">📅 ${s.date}</div>
-        <a href="${s.link}" target="_blank" class="btn btn-sm btn-pink" style="text-decoration:none">${s.buttonText}</a>
-        <button class="btn btn-sm" onclick="deleteShowcase(${s.id})" style="background:var(--danger);color:white;padding:4px 8px;font-size:.75em">✕</button>
-      </div>
-    </div>
-  `).join('');
-}
-
-
 </script>
 
 
@@ -5912,52 +5700,6 @@ function renderShowcases() {
         <div class="modal-actions">
           <button type="button" class="btn btn-outline" onclick="closeModal('modal-add-camp')">Cancel</button>
           <button type="submit" class="btn btn-primary">➕ Add Camp</button>
-        </div>
-        
-      </form>
-    </div>
-  </div>
-</div>
-
-
-<!-- ADD MULTI-SCHOOL SHOWCASE MODAL -->
-<div class="modal-overlay" id="modal-add-showcase">
-  <div class="modal" style="max-width:500px">
-    <div class="modal-header">
-      <span class="modal-title">➕ Add Multi-School Showcase</span>
-      <button class="modal-close" onclick="closeModal('modal-add-showcase')">✕</button>
-    </div>
-    <div class="modal-body">
-      <form onsubmit="saveNewShowcase(event)">
-        
-        <div class="form-group">
-          <label class="form-label">Showcase Name *</label>
-          <input class="form-input" type="text" id="new-showcase-name" placeholder="e.g., Women's College Soccer Prospect ID Showcase" required>
-        </div>
-        
-        <div class="form-group">
-          <label class="form-label">Description</label>
-          <input class="form-input" type="text" id="new-showcase-desc" placeholder="e.g., Multi-coach showcase event">
-        </div>
-        
-        <div class="form-group">
-          <label class="form-label">Date *</label>
-          <input class="form-input" type="text" id="new-showcase-date" placeholder="e.g., Feb 21, 2026" required>
-        </div>
-        
-        <div class="form-group">
-          <label class="form-label">Registration Link *</label>
-          <input class="form-input" type="url" id="new-showcase-link" placeholder="https://..." required>
-        </div>
-        
-        <div class="form-group">
-          <label class="form-label">Button Text</label>
-          <input class="form-input" type="text" id="new-showcase-btn" placeholder="e.g., Register or View Details" value="Register">
-        </div>
-        
-        <div class="modal-actions">
-          <button type="button" class="btn btn-outline" onclick="closeModal('modal-add-showcase')">Cancel</button>
-          <button type="submit" class="btn btn-primary">➕ Add Showcase</button>
         </div>
         
       </form>
