@@ -2579,7 +2579,7 @@ function renderColleges() {
   
   const grid = document.getElementById('college-grid');
   if (!list.length) { grid.innerHTML = '<div class="empty-state"><div class="es-icon">🏫</div><h3>No schools match your filters</h3></div>'; return; }
-  grid.innerHTML = list.map(c => cardHTML(c)).join('');
+  grid.innerHTML = list.map(c => cardHTML(c)).join('\n');
 }
 
 function campStatusIcon(s) {
